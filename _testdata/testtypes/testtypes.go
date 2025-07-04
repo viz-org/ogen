@@ -74,6 +74,17 @@ func (t *Text) UnmarshalText(data []byte) error {
 	return nil
 }
 
+type Binary struct{ Value string }
+
+func (b *Binary) MarshalBinary() ([]byte, error) {
+	return []byte(b.Value), nil
+}
+
+func (b *Binary) UnmarshalBinary(data []byte) error {
+	b.Value = string(data)
+	return nil
+}
+
 type String string
 
 type Number float64

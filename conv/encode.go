@@ -2,6 +2,7 @@ package conv
 
 import (
 	"encoding"
+	"encoding/base64"
 	stdjson "encoding/json"
 	"net"
 	"net/netip"
@@ -81,6 +82,10 @@ type (
 		encoding.TextMarshaler
 		*T
 	}
+	binaryMarshaler[T any] interface {
+		encoding.BinaryMarshaler
+		*T
+	}
 	jsonMarshaler[T any] interface {
 		stdjson.Marshaler
 		*T
@@ -103,8 +108,9 @@ func TextToString[T any, P textMarshaler[T]](v T) string {
 	return BytesToString(b)
 }
 
-func StringTextToString[T any, P textMarshaler[T]](v T) string {
-	return TextToString[T, P](v)
+func BinaryToString[T any, P binaryMarshaler[T]](v T) string {
+	b, _ := P(&v).MarshalBinary()
+	return base64.URLEncoding.EncodeToString(b)
 }
 
 func JSONToString[T any, P jsonMarshaler[T]](v T) string {

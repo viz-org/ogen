@@ -39,6 +39,9 @@ type ExternalEncoding int
 
 // String returns the string representation of the ExternalEncoding.
 func (e ExternalEncoding) String() string {
+	if e == 0 {
+		return "External"
+	}
 	var s strings.Builder
 	for i := ExternalEncoding(1); i <= e; i <<= 1 {
 		if e.Has(i) {

@@ -79,30 +79,31 @@ func (t Type) uriFormat() string {
 	return t.EncodeFn()
 }
 
-func (t Type) externalFormat(e ExternalEncoding) string {
-	typePrefix := func(f string) string {
-		switch t.Schema.Type {
-		case jsonschema.String:
-			return "String" + f
-		default:
-			return f
-		}
-	}
+// externalType defines what available interface to use for encoding/decoding.
+func (t Type) externalType(e ExternalEncoding) ExternalEncoding {
 	switch {
 	case e.Has(ExternalNative):
-		return typePrefix("Native")
+		return ExternalNative
 	case e.Has(ExternalJSON):
-		return typePrefix("JSON")
+		return ExternalJSON
 	case e.Has(ExternalText):
-		return typePrefix("Text")
+		return ExternalText
+	case e.Has(ExternalBinary) && t.Schema.Type == jsonschema.String &&
+		(t.Schema.Format == "byte" || t.Schema.Format == "base64"):
+		return ExternalBinary
 	default:
-		return typePrefix("External")
+		return 0
 	}
 }
 
 func (t Type) ToString() string {
 	if t.IsExternal() {
-		return t.externalFormat(t.External.Encode) + "ToString"
+		external := t.externalType(t.External.Encode)
+		var prefix string
+		if t.Schema.Type == jsonschema.String && external != ExternalText && external != ExternalBinary {
+			prefix = "String"
+		}
+		return prefix + external.String() + "ToString"
 	}
 	encodeFn := t.uriFormat()
 	if encodeFn == "" {
@@ -113,7 +114,12 @@ func (t Type) ToString() string {
 
 func (t Type) FromString() string {
 	if t.IsExternal() {
-		return "To" + t.externalFormat(t.External.Encode) + "[" + t.Primitive.String() + "]"
+		external := t.externalType(t.External.Decode)
+		var prefix string
+		if t.Schema.Type == jsonschema.String && external != ExternalText && external != ExternalBinary {
+			prefix = "String"
+		}
+		return "To" + prefix + external.String() + "[" + t.Primitive.String() + "]"
 	}
 	encodeFn := t.uriFormat()
 	if encodeFn == "" {

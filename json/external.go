@@ -2,6 +2,7 @@ package json
 
 import (
 	"encoding"
+	"encoding/base64"
 	"encoding/json"
 
 	"github.com/go-faster/jx"
@@ -24,6 +25,14 @@ type (
 		encoding.TextUnmarshaler
 		*T
 	}
+	binaryMarshaler[T any] interface {
+		encoding.BinaryMarshaler
+		*T
+	}
+	binaryUnmarshaler[T any] interface {
+		encoding.BinaryUnmarshaler
+		*T
+	}
 	jsonMarshaler[T any] interface {
 		json.Marshaler
 		*T
@@ -44,16 +53,6 @@ func DecodeNative[T any, P unmarshaler[T]](d *jx.Decoder) (T, error) {
 	var v T
 	err := P(&v).Decode(d)
 	return v, err
-}
-
-// EncodeStringNative encodes a string value using [Marshaler] interface.
-func EncodeStringNative[T any, P marshaler[T]](e *jx.Encoder, v T) {
-	EncodeNative[T, P](e, v)
-}
-
-// DecodeStringNative decodes a string value using [Unmarshaler] interface.
-func DecodeStringNative[T any, P unmarshaler[T]](d *jx.Decoder) (T, error) {
-	return DecodeNative[T, P](d)
 }
 
 // EncodeText encodes a value using [encoding.TextMarshaler] interface.
@@ -90,6 +89,30 @@ func DecodeStringText[T any, P textUnmarshaler[T]](d *jx.Decoder) (T, error) {
 	return v, err
 }
 
+// EncodeBinary encodes a value using [encoding.BinaryMarshaler] interface.
+func EncodeBinary[T any, P binaryMarshaler[T]](e *jx.Encoder, v T) {
+	raw, _ := P(&v).MarshalBinary()
+	encoded := make([]byte, base64.StdEncoding.EncodedLen(len(raw)))
+	base64.StdEncoding.Encode(encoded, raw)
+	e.ByteStr(encoded)
+}
+
+// DecodeBinary decodes a value using [encoding.BinaryUnmarshaler] interface.
+func DecodeBinary[T any, P binaryUnmarshaler[T]](d *jx.Decoder) (T, error) {
+	var v T
+	raw, err := d.StrBytes()
+	if err != nil {
+		return v, err
+	}
+	decoded := make([]byte, base64.StdEncoding.DecodedLen(len(raw)))
+	n, err := base64.StdEncoding.Decode(decoded, raw)
+	if err != nil {
+		return v, err
+	}
+	err = P(&v).UnmarshalBinary(decoded[:n])
+	return v, err
+}
+
 // EncodeJSON encodes a value using [json.Marshaler] interface.
 func EncodeJSON[T any, P jsonMarshaler[T]](e *jx.Encoder, v T) {
 	b, _ := P(&v).MarshalJSON()
@@ -107,16 +130,6 @@ func DecodeJSON[T any, P jsonUnmarshaler[T]](d *jx.Decoder) (T, error) {
 	return v, err
 }
 
-// EncodeStringJSON encodes a string value using [json.Marshaler] interface.
-func EncodeStringJSON[T any, P jsonMarshaler[T]](e *jx.Encoder, v T) {
-	EncodeJSON[T, P](e, v)
-}
-
-// DecodeStringJSON decodes a string value using [json.Marshaler] interface.
-func DecodeStringJSON[T any, P jsonUnmarshaler[T]](d *jx.Decoder) (T, error) {
-	return DecodeJSON[T, P](d)
-}
-
 // EncodeExternal encodes a value using [json.Marshal].
 func EncodeExternal[T any](e *jx.Encoder, v T) {
 	b, _ := json.Marshal(v)
@@ -132,14 +145,4 @@ func DecodeExternal[T any](d *jx.Decoder) (T, error) {
 	}
 	err = json.Unmarshal(b, &v)
 	return v, err
-}
-
-// EncodeStringExternal encodes a string value using [json.Marshal].
-func EncodeStringExternal[T any](e *jx.Encoder, v T) {
-	EncodeExternal(e, v)
-}
-
-// DecodeStringExternal decodes a string value using [json.Unmarshal].
-func DecodeStringExternal[T any](d *jx.Decoder) (T, error) {
-	return DecodeExternal[T](d)
 }

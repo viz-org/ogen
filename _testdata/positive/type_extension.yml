@@ -43,35 +43,49 @@ paths:
             type: number
             x-ogen-type: github.com/ogen-go/ogen/_testdata/testtypes.Text
             default: 60
+        - name: binaryByte
+          in: query
+          schema:
+            type: string
+            format: byte
+            x-ogen-type: github.com/ogen-go/ogen/_testdata/testtypes.Binary
+            default: NzA=
+        - name: binaryBase64
+          in: query
+          schema:
+            type: string
+            format: base64
+            x-ogen-type: github.com/ogen-go/ogen/_testdata/testtypes.Binary
+            default: ODA=
         - name: string
           in: query
           schema:
             type: string
             x-ogen-type: github.com/ogen-go/ogen/_testdata/testtypes.String
-            default: '70'
+            default: '90'
         - name: number
           in: query
           schema:
             type: number
             x-ogen-type: github.com/ogen-go/ogen/_testdata/testtypes.Number
-            default: 80
+            default: 100
         - name: alias
           in: query
           schema:
             $ref: '#/components/schemas/Alias'
-            default: '90'
+            default: '110'
         - name: pointer
           in: query
           schema:
             type: number
             x-ogen-type: '*github.com/ogen-go/ogen/_testdata/testtypes.NumberOgen'
             x-ogen-name: Pointer
-            default: 100
+            default: 120
         - name: aliasPointer
           in: query
           schema:
             $ref: '#/components/schemas/AliasPointer'
-            default: '110'
+            default: '130'
         - name: array
           in: query
           schema:
@@ -111,25 +125,35 @@ paths:
                     type: number
                     x-ogen-type: github.com/ogen-go/ogen/_testdata/testtypes.Text
                     default: 60
+                  binaryByte:
+                    type: string
+                    format: byte
+                    x-ogen-type: github.com/ogen-go/ogen/_testdata/testtypes.Binary
+                    default: NzA=
+                  binaryBase64:
+                    type: string
+                    format: base64
+                    x-ogen-type: github.com/ogen-go/ogen/_testdata/testtypes.Binary
+                    default: ODA=
                   string:
                     type: string
                     x-ogen-type: github.com/ogen-go/ogen/_testdata/testtypes.String
-                    default: '70'
+                    default: '90'
                   number:
                     type: number
                     x-ogen-type: github.com/ogen-go/ogen/_testdata/testtypes.Number
-                    default: 80
+                    default: 100
                   alias:
                     $ref: '#/components/schemas/Alias'
-                    default: '90'
+                    default: '110'
                   pointer:
                     type: number
                     x-ogen-type: '*github.com/ogen-go/ogen/_testdata/testtypes.NumberOgen'
                     x-ogen-name: Pointer
-                    default: 100
+                    default: 120
                   aliasPointer:
                     $ref: '#/components/schemas/AliasPointer'
-                    default: '110'
+                    default: '130'
                   builtin:
                     type: object
                     properties:
@@ -189,6 +213,20 @@ paths:
           schema:
             type: number
             x-ogen-type: github.com/ogen-go/ogen/_testdata/testtypes.Text
+        - name: binaryByte
+          in: query
+          required: true
+          schema:
+            type: string
+            format: byte
+            x-ogen-type: github.com/ogen-go/ogen/_testdata/testtypes.Binary
+        - name: binaryBase64
+          in: query
+          required: true
+          schema:
+            type: string
+            format: base64
+            x-ogen-type: github.com/ogen-go/ogen/_testdata/testtypes.Binary
         - name: string
           in: query
           required: true
@@ -240,6 +278,8 @@ paths:
                   - jsonNumber
                   - textString
                   - textNumber
+                  - binaryByte
+                  - binaryBase64
                   - string
                   - number
                   - alias
@@ -267,6 +307,14 @@ paths:
                   textNumber:
                     type: number
                     x-ogen-type: github.com/ogen-go/ogen/_testdata/testtypes.Text
+                  binaryByte:
+                    type: string
+                    format: byte
+                    x-ogen-type: github.com/ogen-go/ogen/_testdata/testtypes.Binary
+                  binaryBase64:
+                    type: string
+                    format: base64
+                    x-ogen-type: github.com/ogen-go/ogen/_testdata/testtypes.Binary
                   string:
                     type: string
                     x-ogen-type: github.com/ogen-go/ogen/_testdata/testtypes.String

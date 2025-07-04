@@ -334,7 +334,12 @@ func (j JSON) TimeFormat() string {
 // UUID is Encoder.
 func (j JSON) Encoder() string {
 	if j.t.IsExternal() {
-		return j.t.externalFormat(j.t.External.Encode)
+		external := j.t.externalType(j.t.External.Encode)
+		var prefix string
+		if j.t.Schema.Type == jsonschema.String && external == ExternalText {
+			prefix = "String"
+		}
+		return prefix + external.String()
 	}
 	return j.Format()
 }
@@ -345,7 +350,12 @@ func (j JSON) Encoder() string {
 // UUID is Decoder.
 func (j JSON) Decoder() string {
 	if j.t.IsExternal() {
-		return j.t.externalFormat(j.t.External.Decode) + "[" + j.t.Primitive.String() + "]"
+		external := j.t.externalType(j.t.External.Decode)
+		var prefix string
+		if j.t.Schema.Type == jsonschema.String && external == ExternalText {
+			prefix = "String"
+		}
+		return prefix + external.String() + "[" + j.t.Primitive.String() + "]"
 	}
 	return j.Format()
 }

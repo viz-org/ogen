@@ -23,19 +23,6 @@ func TestDecodeNative(t *testing.T) {
 	require.Equal(t, testtypes.NumberOgen{Value: 123}, val)
 }
 
-func TestEncodeStringNative(t *testing.T) {
-	var e jx.Encoder
-	json.EncodeStringNative(&e, testtypes.StringOgen{Value: "test"})
-	require.Equal(t, []byte(`"test"`), e.Bytes())
-}
-
-func TestDecodeStringNative(t *testing.T) {
-	d := jx.DecodeBytes([]byte(`"test"`))
-	val, err := json.DecodeStringNative[testtypes.StringOgen](d)
-	require.NoError(t, err)
-	require.Equal(t, testtypes.StringOgen{Value: "test"}, val)
-}
-
 func TestEncodeText(t *testing.T) {
 	var e jx.Encoder
 	json.EncodeText(&e, testtypes.Text{Value: "123"})
@@ -62,6 +49,19 @@ func TestDecodeStringText(t *testing.T) {
 	require.Equal(t, testtypes.Text{Value: "test"}, val)
 }
 
+func TestEncodeBinary(t *testing.T) {
+	var e jx.Encoder
+	json.EncodeBinary(&e, testtypes.Binary{Value: "hello"})
+	require.Equal(t, []byte(`"aGVsbG8="`), e.Bytes())
+}
+
+func TestDecodeBinary(t *testing.T) {
+	d := jx.DecodeBytes([]byte(`"aGVsbG8="`))
+	val, err := json.DecodeBinary[testtypes.Binary](d)
+	require.NoError(t, err)
+	require.Equal(t, testtypes.Binary{Value: "hello"}, val)
+}
+
 func TestEncodeJSON(t *testing.T) {
 	var e jx.Encoder
 	json.EncodeJSON(&e, testtypes.NumberJSON{Value: 123})
@@ -71,19 +71,6 @@ func TestEncodeJSON(t *testing.T) {
 func TestDecodeJSON(t *testing.T) {
 	d := jx.DecodeBytes([]byte("123"))
 	val, err := json.DecodeJSON[testtypes.NumberJSON](d)
-	require.NoError(t, err)
-	require.Equal(t, float64(123), val.Value)
-}
-
-func TestEncodeStringJSON(t *testing.T) {
-	var e jx.Encoder
-	json.EncodeStringJSON(&e, testtypes.NumberJSON{Value: 123})
-	require.JSONEq(t, "123", string(e.Bytes()))
-}
-
-func TestDecodeStringJSON(t *testing.T) {
-	d := jx.DecodeBytes([]byte("123"))
-	val, err := json.DecodeStringJSON[testtypes.NumberJSON](d)
 	require.NoError(t, err)
 	require.Equal(t, float64(123), val.Value)
 }
@@ -99,17 +86,4 @@ func TestDecodeExternal(t *testing.T) {
 	val, err := json.DecodeExternal[testtypes.Number](d)
 	require.NoError(t, err)
 	require.Equal(t, testtypes.Number(123), val)
-}
-
-func TestEncodeStringExternal(t *testing.T) {
-	var e jx.Encoder
-	json.EncodeStringExternal(&e, testtypes.String("test"))
-	require.Equal(t, []byte(`"test"`), e.Bytes())
-}
-
-func TestDecodeStringExternal(t *testing.T) {
-	d := jx.DecodeBytes([]byte(`"test"`))
-	val, err := json.DecodeStringExternal[testtypes.String](d)
-	require.NoError(t, err)
-	require.Equal(t, testtypes.String("test"), val)
 }

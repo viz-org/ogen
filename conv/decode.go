@@ -2,6 +2,7 @@ package conv
 
 import (
 	"encoding"
+	"encoding/base64"
 	stdjson "encoding/json"
 	"net"
 	"net/netip"
@@ -223,6 +224,10 @@ type (
 		encoding.TextUnmarshaler
 		*T
 	}
+	binaryUnmarshaler[T any] interface {
+		encoding.BinaryUnmarshaler
+		*T
+	}
 	jsonUnmarshaler[T any] interface {
 		stdjson.Unmarshaler
 		*T
@@ -245,8 +250,14 @@ func ToText[T any, P textUnmarshaler[T]](s string) (T, error) {
 	return v, err
 }
 
-func ToStringText[T any, P textUnmarshaler[T]](s string) (T, error) {
-	return ToText[T, P](s)
+func ToBinary[T any, P binaryUnmarshaler[T]](s string) (T, error) {
+	var v T
+	data, err := base64.URLEncoding.DecodeString(s)
+	if err != nil {
+		return v, err
+	}
+	err = P(&v).UnmarshalBinary(data)
+	return v, err
 }
 
 func ToJSON[T any, P jsonUnmarshaler[T]](s string) (T, error) {
