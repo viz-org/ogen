@@ -12,7 +12,7 @@ import (
 // setDefaults set default value of fields.
 func (s *OptionalOK) setDefaults() {
 	{
-		val, _ := json.DecodeStringExternal[decimal.Decimal](jx.DecodeStr("\"1.23\""))
+		val, _ := json.DecodeExternal[decimal.Decimal](jx.DecodeStr("\"1.23\""))
 		s.Foo.SetTo(val)
 	}
 	{

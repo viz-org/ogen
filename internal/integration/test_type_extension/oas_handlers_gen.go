@@ -146,6 +146,14 @@ func (s *Server) handleOptionalRequest(args [0]string, argsEscaped bool, w http.
 					In:   "query",
 				}: params.TextNumber,
 				{
+					Name: "binaryByte",
+					In:   "query",
+				}: params.BinaryByte,
+				{
+					Name: "binaryBase64",
+					In:   "query",
+				}: params.BinaryBase64,
+				{
 					Name: "string",
 					In:   "query",
 				}: params.String,
@@ -325,6 +333,14 @@ func (s *Server) handleRequiredRequest(args [0]string, argsEscaped bool, w http.
 					Name: "textNumber",
 					In:   "query",
 				}: params.TextNumber,
+				{
+					Name: "binaryByte",
+					In:   "query",
+				}: params.BinaryByte,
+				{
+					Name: "binaryBase64",
+					In:   "query",
+				}: params.BinaryBase64,
 				{
 					Name: "string",
 					In:   "query",

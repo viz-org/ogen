@@ -47,7 +47,7 @@ func decodeOptionalParams(args [0]string, argsEscaped bool, r *http.Request) (pa
 	q := uri.NewQueryDecoder(r.URL.Query())
 	// Set default value for query: foo.
 	{
-		val, _ := json.DecodeStringExternal[decimal.Decimal](jx.DecodeStr("\"1.23\""))
+		val, _ := json.DecodeExternal[decimal.Decimal](jx.DecodeStr("\"1.23\""))
 		params.Foo.SetTo(val)
 	}
 	// Decode query: foo.

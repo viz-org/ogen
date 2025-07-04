@@ -23,6 +23,8 @@ type OptionalParams struct {
 	JsonNumber   OptNumberJSON
 	TextString   OptText
 	TextNumber   OptText
+	BinaryByte   OptBinary
+	BinaryBase64 OptBinary
 	String       OptString
 	Number       OptNumber
 	Alias        OptAlias
@@ -88,6 +90,24 @@ func unpackOptionalParams(packed middleware.Parameters) (params OptionalParams) 
 	}
 	{
 		key := middleware.ParameterKey{
+			Name: "binaryByte",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.BinaryByte = v.(OptBinary)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "binaryBase64",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.BinaryBase64 = v.(OptBinary)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
 			Name: "string",
 			In:   "query",
 		}
@@ -147,7 +167,7 @@ func decodeOptionalParams(args [0]string, argsEscaped bool, r *http.Request) (pa
 	q := uri.NewQueryDecoder(r.URL.Query())
 	// Set default value for query: ogenString.
 	{
-		val, _ := json.DecodeStringNative[testtypes.StringOgen](jx.DecodeStr("\"10\""))
+		val, _ := json.DecodeNative[testtypes.StringOgen](jx.DecodeStr("\"10\""))
 		params.OgenString.SetTo(val)
 	}
 	// Decode query: ogenString.
@@ -239,7 +259,7 @@ func decodeOptionalParams(args [0]string, argsEscaped bool, r *http.Request) (pa
 	}
 	// Set default value for query: jsonString.
 	{
-		val, _ := json.DecodeStringJSON[testtypes.StringJSON](jx.DecodeStr("\"30\""))
+		val, _ := json.DecodeJSON[testtypes.StringJSON](jx.DecodeStr("\"30\""))
 		params.JsonString.SetTo(val)
 	}
 	// Decode query: jsonString.
@@ -351,7 +371,7 @@ func decodeOptionalParams(args [0]string, argsEscaped bool, r *http.Request) (pa
 						return err
 					}
 
-					c, err := conv.ToStringText[testtypes.Text](val)
+					c, err := conv.ToText[testtypes.Text](val)
 					if err != nil {
 						return err
 					}
@@ -421,9 +441,101 @@ func decodeOptionalParams(args [0]string, argsEscaped bool, r *http.Request) (pa
 			Err:  err,
 		}
 	}
+	// Set default value for query: binaryByte.
+	{
+		val, _ := json.DecodeBinary[testtypes.Binary](jx.DecodeStr("\"NzA=\""))
+		params.BinaryByte.SetTo(val)
+	}
+	// Decode query: binaryByte.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "binaryByte",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotBinaryByteVal testtypes.Binary
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToBinary[testtypes.Binary](val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotBinaryByteVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.BinaryByte.SetTo(paramsDotBinaryByteVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "binaryByte",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Set default value for query: binaryBase64.
+	{
+		val, _ := json.DecodeBinary[testtypes.Binary](jx.DecodeStr("\"ODA=\""))
+		params.BinaryBase64.SetTo(val)
+	}
+	// Decode query: binaryBase64.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "binaryBase64",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotBinaryBase64Val testtypes.Binary
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToBinary[testtypes.Binary](val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotBinaryBase64Val = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.BinaryBase64.SetTo(paramsDotBinaryBase64Val)
+				return nil
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "binaryBase64",
+			In:   "query",
+			Err:  err,
+		}
+	}
 	// Set default value for query: string.
 	{
-		val, _ := json.DecodeStringExternal[testtypes.String](jx.DecodeStr("\"70\""))
+		val, _ := json.DecodeExternal[testtypes.String](jx.DecodeStr("\"90\""))
 		params.String.SetTo(val)
 	}
 	// Decode query: string.
@@ -469,7 +581,7 @@ func decodeOptionalParams(args [0]string, argsEscaped bool, r *http.Request) (pa
 	}
 	// Set default value for query: number.
 	{
-		val, _ := json.DecodeExternal[testtypes.Number](jx.DecodeStr("80"))
+		val, _ := json.DecodeExternal[testtypes.Number](jx.DecodeStr("100"))
 		params.Number.SetTo(val)
 	}
 	// Decode query: number.
@@ -515,7 +627,7 @@ func decodeOptionalParams(args [0]string, argsEscaped bool, r *http.Request) (pa
 	}
 	// Set default value for query: alias.
 	{
-		val, _ := json.DecodeStringNative[testtypes.StringOgen](jx.DecodeStr("\"90\""))
+		val, _ := json.DecodeNative[testtypes.StringOgen](jx.DecodeStr("\"110\""))
 		params.Alias.SetTo(Alias(val))
 	}
 	// Decode query: alias.
@@ -568,7 +680,7 @@ func decodeOptionalParams(args [0]string, argsEscaped bool, r *http.Request) (pa
 	}
 	// Set default value for query: pointer.
 	{
-		val, _ := json.DecodeNative[testtypes.NumberOgen](jx.DecodeStr("100"))
+		val, _ := json.DecodeNative[testtypes.NumberOgen](jx.DecodeStr("120"))
 		params.Pointer.SetTo(val)
 	}
 	// Decode query: pointer.
@@ -614,7 +726,7 @@ func decodeOptionalParams(args [0]string, argsEscaped bool, r *http.Request) (pa
 	}
 	// Set default value for query: aliasPointer.
 	{
-		val, _ := json.DecodeStringNative[testtypes.StringOgen](jx.DecodeStr("\"110\""))
+		val, _ := json.DecodeNative[testtypes.StringOgen](jx.DecodeStr("\"130\""))
 		params.AliasPointer.SetTo(AliasPointer(val))
 	}
 	// Decode query: aliasPointer.
@@ -719,6 +831,8 @@ type RequiredParams struct {
 	JsonNumber   testtypes.NumberJSON
 	TextString   testtypes.Text
 	TextNumber   testtypes.Text
+	BinaryByte   testtypes.Binary
+	BinaryBase64 testtypes.Binary
 	String       testtypes.String
 	Number       testtypes.Number
 	Alias        Alias
@@ -769,6 +883,20 @@ func unpackRequiredParams(packed middleware.Parameters) (params RequiredParams) 
 			In:   "query",
 		}
 		params.TextNumber = packed[key].(testtypes.Text)
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "binaryByte",
+			In:   "query",
+		}
+		params.BinaryByte = packed[key].(testtypes.Binary)
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "binaryBase64",
+			In:   "query",
+		}
+		params.BinaryBase64 = packed[key].(testtypes.Binary)
 	}
 	{
 		key := middleware.ParameterKey{
@@ -976,7 +1104,7 @@ func decodeRequiredParams(args [0]string, argsEscaped bool, r *http.Request) (pa
 					return err
 				}
 
-				c, err := conv.ToStringText[testtypes.Text](val)
+				c, err := conv.ToText[testtypes.Text](val)
 				if err != nil {
 					return err
 				}
@@ -1029,6 +1157,78 @@ func decodeRequiredParams(args [0]string, argsEscaped bool, r *http.Request) (pa
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
 			Name: "textNumber",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: binaryByte.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "binaryByte",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToBinary[testtypes.Binary](val)
+				if err != nil {
+					return err
+				}
+
+				params.BinaryByte = c
+				return nil
+			}); err != nil {
+				return err
+			}
+		} else {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "binaryByte",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: binaryBase64.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "binaryBase64",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToBinary[testtypes.Binary](val)
+				if err != nil {
+					return err
+				}
+
+				params.BinaryBase64 = c
+				return nil
+			}); err != nil {
+				return err
+			}
+		} else {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "binaryBase64",
 			In:   "query",
 			Err:  err,
 		}
@@ -1107,7 +1307,7 @@ func decodeRequiredParams(args [0]string, argsEscaped bool, r *http.Request) (pa
 	}
 	// Set default value for query: alias.
 	{
-		val, _ := json.DecodeStringNative[testtypes.StringOgen](jx.DecodeStr("\"90\""))
+		val, _ := json.DecodeNative[testtypes.StringOgen](jx.DecodeStr("\"110\""))
 		params.Alias = Alias(val)
 	}
 	// Decode query: alias.
@@ -1191,7 +1391,7 @@ func decodeRequiredParams(args [0]string, argsEscaped bool, r *http.Request) (pa
 	}
 	// Set default value for query: aliasPointer.
 	{
-		val, _ := json.DecodeStringNative[testtypes.StringOgen](jx.DecodeStr("\"110\""))
+		val, _ := json.DecodeNative[testtypes.StringOgen](jx.DecodeStr("\"130\""))
 		params.AliasPointer = AliasPointer(val)
 	}
 	// Decode query: aliasPointer.

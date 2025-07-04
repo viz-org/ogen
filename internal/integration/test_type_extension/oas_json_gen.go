@@ -17,7 +17,7 @@ import (
 func (s Alias) Encode(e *jx.Encoder) {
 	unwrapped := testtypes.StringOgen(s)
 
-	json.EncodeStringNative(e, unwrapped)
+	json.EncodeNative(e, unwrapped)
 }
 
 // Decode decodes Alias from json.
@@ -27,7 +27,7 @@ func (s *Alias) Decode(d *jx.Decoder) error {
 	}
 	var unwrapped testtypes.StringOgen
 	if err := func() error {
-		v, err := json.DecodeStringNative[testtypes.StringOgen](d)
+		v, err := json.DecodeNative[testtypes.StringOgen](d)
 		unwrapped = v
 		if err != nil {
 			return err
@@ -57,7 +57,7 @@ func (s *Alias) UnmarshalJSON(data []byte) error {
 func (s AliasPointer) Encode(e *jx.Encoder) {
 	unwrapped := testtypes.StringOgen(s)
 
-	json.EncodeStringNative(e, unwrapped)
+	json.EncodeNative(e, unwrapped)
 }
 
 // Decode decodes AliasPointer from json.
@@ -67,7 +67,7 @@ func (s *AliasPointer) Decode(d *jx.Decoder) error {
 	}
 	var unwrapped testtypes.StringOgen
 	if err := func() error {
-		v, err := json.DecodeStringNative[testtypes.StringOgen](d)
+		v, err := json.DecodeNative[testtypes.StringOgen](d)
 		unwrapped = v
 		if err != nil {
 			return err
@@ -192,6 +192,41 @@ func (s OptAny) MarshalJSON() ([]byte, error) {
 func (s *OptAny) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d, json.DecodeExternal[any])
+}
+
+// Encode encodes testtypes.Binary as json.
+func (o OptBinary) Encode(e *jx.Encoder, format func(*jx.Encoder, testtypes.Binary)) {
+	if !o.Set {
+		return
+	}
+	format(e, o.Value)
+}
+
+// Decode decodes testtypes.Binary from json.
+func (o *OptBinary) Decode(d *jx.Decoder, format func(*jx.Decoder) (testtypes.Binary, error)) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptBinary to nil")
+	}
+	o.Set = true
+	v, err := format(d)
+	if err != nil {
+		return err
+	}
+	o.Value = v
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptBinary) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e, json.EncodeBinary)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptBinary) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d, json.DecodeBinary[testtypes.Binary])
 }
 
 // Encode encodes testtypes.Number as json.
@@ -393,14 +428,14 @@ func (o *OptString) Decode(d *jx.Decoder, format func(*jx.Decoder) (testtypes.St
 // MarshalJSON implements stdjson.Marshaler.
 func (s OptString) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
-	s.Encode(&e, json.EncodeStringExternal)
+	s.Encode(&e, json.EncodeExternal)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *OptString) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
-	return s.Decode(d, json.DecodeStringExternal[testtypes.String])
+	return s.Decode(d, json.DecodeExternal[testtypes.String])
 }
 
 // Encode encodes testtypes.StringJSON as json.
@@ -428,14 +463,14 @@ func (o *OptStringJSON) Decode(d *jx.Decoder, format func(*jx.Decoder) (testtype
 // MarshalJSON implements stdjson.Marshaler.
 func (s OptStringJSON) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
-	s.Encode(&e, json.EncodeStringJSON)
+	s.Encode(&e, json.EncodeJSON)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *OptStringJSON) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
-	return s.Decode(d, json.DecodeStringJSON[testtypes.StringJSON])
+	return s.Decode(d, json.DecodeJSON[testtypes.StringJSON])
 }
 
 // Encode encodes testtypes.StringOgen as json.
@@ -463,14 +498,14 @@ func (o *OptStringOgen) Decode(d *jx.Decoder, format func(*jx.Decoder) (testtype
 // MarshalJSON implements stdjson.Marshaler.
 func (s OptStringOgen) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
-	s.Encode(&e, json.EncodeStringNative)
+	s.Encode(&e, json.EncodeNative)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *OptStringOgen) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
-	return s.Decode(d, json.DecodeStringNative[testtypes.StringOgen])
+	return s.Decode(d, json.DecodeNative[testtypes.StringOgen])
 }
 
 // Encode encodes testtypes.Text as json.
@@ -520,7 +555,7 @@ func (s *OptionalOK) encodeFields(e *jx.Encoder) {
 	{
 		if s.OgenString.Set {
 			e.FieldStart("ogenString")
-			s.OgenString.Encode(e, json.EncodeStringNative)
+			s.OgenString.Encode(e, json.EncodeNative)
 		}
 	}
 	{
@@ -532,7 +567,7 @@ func (s *OptionalOK) encodeFields(e *jx.Encoder) {
 	{
 		if s.JsonString.Set {
 			e.FieldStart("jsonString")
-			s.JsonString.Encode(e, json.EncodeStringJSON)
+			s.JsonString.Encode(e, json.EncodeJSON)
 		}
 	}
 	{
@@ -554,9 +589,21 @@ func (s *OptionalOK) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
+		if s.BinaryByte.Set {
+			e.FieldStart("binaryByte")
+			s.BinaryByte.Encode(e, json.EncodeBinary)
+		}
+	}
+	{
+		if s.BinaryBase64.Set {
+			e.FieldStart("binaryBase64")
+			s.BinaryBase64.Encode(e, json.EncodeBinary)
+		}
+	}
+	{
 		if s.String.Set {
 			e.FieldStart("string")
-			s.String.Encode(e, json.EncodeStringExternal)
+			s.String.Encode(e, json.EncodeExternal)
 		}
 	}
 	{
@@ -594,7 +641,7 @@ func (s *OptionalOK) encodeFields(e *jx.Encoder) {
 			e.FieldStart("array")
 			e.ArrStart()
 			for _, elem := range s.Array {
-				json.EncodeStringJSON(e, elem)
+				json.EncodeJSON(e, elem)
 			}
 			e.ArrEnd()
 		}
@@ -607,21 +654,23 @@ func (s *OptionalOK) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfOptionalOK = [14]string{
+var jsonFieldsNameOfOptionalOK = [16]string{
 	0:  "ogenString",
 	1:  "ogenNumber",
 	2:  "jsonString",
 	3:  "jsonNumber",
 	4:  "textString",
 	5:  "textNumber",
-	6:  "string",
-	7:  "number",
-	8:  "alias",
-	9:  "pointer",
-	10: "aliasPointer",
-	11: "builtin",
-	12: "array",
-	13: "map",
+	6:  "binaryByte",
+	7:  "binaryBase64",
+	8:  "string",
+	9:  "number",
+	10: "alias",
+	11: "pointer",
+	12: "aliasPointer",
+	13: "builtin",
+	14: "array",
+	15: "map",
 }
 
 // Decode decodes OptionalOK from json.
@@ -636,7 +685,7 @@ func (s *OptionalOK) Decode(d *jx.Decoder) error {
 		case "ogenString":
 			if err := func() error {
 				s.OgenString.Reset()
-				if err := s.OgenString.Decode(d, json.DecodeStringNative[testtypes.StringOgen]); err != nil {
+				if err := s.OgenString.Decode(d, json.DecodeNative[testtypes.StringOgen]); err != nil {
 					return err
 				}
 				return nil
@@ -656,7 +705,7 @@ func (s *OptionalOK) Decode(d *jx.Decoder) error {
 		case "jsonString":
 			if err := func() error {
 				s.JsonString.Reset()
-				if err := s.JsonString.Decode(d, json.DecodeStringJSON[testtypes.StringJSON]); err != nil {
+				if err := s.JsonString.Decode(d, json.DecodeJSON[testtypes.StringJSON]); err != nil {
 					return err
 				}
 				return nil
@@ -693,10 +742,30 @@ func (s *OptionalOK) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"textNumber\"")
 			}
+		case "binaryByte":
+			if err := func() error {
+				s.BinaryByte.Reset()
+				if err := s.BinaryByte.Decode(d, json.DecodeBinary[testtypes.Binary]); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"binaryByte\"")
+			}
+		case "binaryBase64":
+			if err := func() error {
+				s.BinaryBase64.Reset()
+				if err := s.BinaryBase64.Decode(d, json.DecodeBinary[testtypes.Binary]); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"binaryBase64\"")
+			}
 		case "string":
 			if err := func() error {
 				s.String.Reset()
-				if err := s.String.Decode(d, json.DecodeStringExternal[testtypes.String]); err != nil {
+				if err := s.String.Decode(d, json.DecodeExternal[testtypes.String]); err != nil {
 					return err
 				}
 				return nil
@@ -758,7 +827,7 @@ func (s *OptionalOK) Decode(d *jx.Decoder) error {
 				s.Array = make([]testtypes.StringJSON, 0)
 				if err := d.Arr(func(d *jx.Decoder) error {
 					var elem testtypes.StringJSON
-					v, err := json.DecodeStringJSON[testtypes.StringJSON](d)
+					v, err := json.DecodeJSON[testtypes.StringJSON](d)
 					elem = v
 					if err != nil {
 						return err
@@ -818,7 +887,7 @@ func (s OptionalOKMap) encodeFields(e *jx.Encoder) {
 	for k, elem := range s {
 		e.FieldStart(k)
 
-		json.EncodeStringJSON(e, elem)
+		json.EncodeJSON(e, elem)
 	}
 }
 
@@ -831,7 +900,7 @@ func (s *OptionalOKMap) Decode(d *jx.Decoder) error {
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		var elem testtypes.StringJSON
 		if err := func() error {
-			v, err := json.DecodeStringJSON[testtypes.StringJSON](d)
+			v, err := json.DecodeJSON[testtypes.StringJSON](d)
 			elem = v
 			if err != nil {
 				return err
@@ -873,7 +942,7 @@ func (s *RequiredOK) Encode(e *jx.Encoder) {
 func (s *RequiredOK) encodeFields(e *jx.Encoder) {
 	{
 		e.FieldStart("ogenString")
-		json.EncodeStringNative(e, s.OgenString)
+		json.EncodeNative(e, s.OgenString)
 	}
 	{
 		e.FieldStart("ogenNumber")
@@ -881,7 +950,7 @@ func (s *RequiredOK) encodeFields(e *jx.Encoder) {
 	}
 	{
 		e.FieldStart("jsonString")
-		json.EncodeStringJSON(e, s.JsonString)
+		json.EncodeJSON(e, s.JsonString)
 	}
 	{
 		e.FieldStart("jsonNumber")
@@ -896,8 +965,16 @@ func (s *RequiredOK) encodeFields(e *jx.Encoder) {
 		json.EncodeText(e, s.TextNumber)
 	}
 	{
+		e.FieldStart("binaryByte")
+		json.EncodeBinary(e, s.BinaryByte)
+	}
+	{
+		e.FieldStart("binaryBase64")
+		json.EncodeBinary(e, s.BinaryBase64)
+	}
+	{
 		e.FieldStart("string")
-		json.EncodeStringExternal(e, s.String)
+		json.EncodeExternal(e, s.String)
 	}
 	{
 		e.FieldStart("number")
@@ -923,7 +1000,7 @@ func (s *RequiredOK) encodeFields(e *jx.Encoder) {
 		e.FieldStart("array")
 		e.ArrStart()
 		for _, elem := range s.Array {
-			json.EncodeStringJSON(e, elem)
+			json.EncodeJSON(e, elem)
 		}
 		e.ArrEnd()
 	}
@@ -933,21 +1010,23 @@ func (s *RequiredOK) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfRequiredOK = [14]string{
+var jsonFieldsNameOfRequiredOK = [16]string{
 	0:  "ogenString",
 	1:  "ogenNumber",
 	2:  "jsonString",
 	3:  "jsonNumber",
 	4:  "textString",
 	5:  "textNumber",
-	6:  "string",
-	7:  "number",
-	8:  "alias",
-	9:  "pointer",
-	10: "aliasPointer",
-	11: "builtin",
-	12: "array",
-	13: "map",
+	6:  "binaryByte",
+	7:  "binaryBase64",
+	8:  "string",
+	9:  "number",
+	10: "alias",
+	11: "pointer",
+	12: "aliasPointer",
+	13: "builtin",
+	14: "array",
+	15: "map",
 }
 
 // Decode decodes RequiredOK from json.
@@ -963,7 +1042,7 @@ func (s *RequiredOK) Decode(d *jx.Decoder) error {
 		case "ogenString":
 			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
-				v, err := json.DecodeStringNative[testtypes.StringOgen](d)
+				v, err := json.DecodeNative[testtypes.StringOgen](d)
 				s.OgenString = v
 				if err != nil {
 					return err
@@ -987,7 +1066,7 @@ func (s *RequiredOK) Decode(d *jx.Decoder) error {
 		case "jsonString":
 			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
-				v, err := json.DecodeStringJSON[testtypes.StringJSON](d)
+				v, err := json.DecodeJSON[testtypes.StringJSON](d)
 				s.JsonString = v
 				if err != nil {
 					return err
@@ -1032,10 +1111,34 @@ func (s *RequiredOK) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"textNumber\"")
 			}
-		case "string":
+		case "binaryByte":
 			requiredBitSet[0] |= 1 << 6
 			if err := func() error {
-				v, err := json.DecodeStringExternal[testtypes.String](d)
+				v, err := json.DecodeBinary[testtypes.Binary](d)
+				s.BinaryByte = v
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"binaryByte\"")
+			}
+		case "binaryBase64":
+			requiredBitSet[0] |= 1 << 7
+			if err := func() error {
+				v, err := json.DecodeBinary[testtypes.Binary](d)
+				s.BinaryBase64 = v
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"binaryBase64\"")
+			}
+		case "string":
+			requiredBitSet[1] |= 1 << 0
+			if err := func() error {
+				v, err := json.DecodeExternal[testtypes.String](d)
 				s.String = v
 				if err != nil {
 					return err
@@ -1045,7 +1148,7 @@ func (s *RequiredOK) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"string\"")
 			}
 		case "number":
-			requiredBitSet[0] |= 1 << 7
+			requiredBitSet[1] |= 1 << 1
 			if err := func() error {
 				v, err := json.DecodeExternal[testtypes.Number](d)
 				s.Number = v
@@ -1057,7 +1160,7 @@ func (s *RequiredOK) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"number\"")
 			}
 		case "alias":
-			requiredBitSet[1] |= 1 << 0
+			requiredBitSet[1] |= 1 << 2
 			if err := func() error {
 				if err := s.Alias.Decode(d); err != nil {
 					return err
@@ -1067,7 +1170,7 @@ func (s *RequiredOK) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"alias\"")
 			}
 		case "pointer":
-			requiredBitSet[1] |= 1 << 1
+			requiredBitSet[1] |= 1 << 3
 			if err := func() error {
 				v, err := json.DecodeNative[testtypes.NumberOgen](d)
 				s.Pointer = v
@@ -1079,7 +1182,7 @@ func (s *RequiredOK) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"pointer\"")
 			}
 		case "aliasPointer":
-			requiredBitSet[1] |= 1 << 2
+			requiredBitSet[1] |= 1 << 4
 			if err := func() error {
 				if err := s.AliasPointer.Decode(d); err != nil {
 					return err
@@ -1089,7 +1192,7 @@ func (s *RequiredOK) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"aliasPointer\"")
 			}
 		case "builtin":
-			requiredBitSet[1] |= 1 << 3
+			requiredBitSet[1] |= 1 << 5
 			if err := func() error {
 				v, err := json.DecodeExternal[any](d)
 				s.Builtin = v
@@ -1101,12 +1204,12 @@ func (s *RequiredOK) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"builtin\"")
 			}
 		case "array":
-			requiredBitSet[1] |= 1 << 4
+			requiredBitSet[1] |= 1 << 6
 			if err := func() error {
 				s.Array = make([]testtypes.StringJSON, 0)
 				if err := d.Arr(func(d *jx.Decoder) error {
 					var elem testtypes.StringJSON
-					v, err := json.DecodeStringJSON[testtypes.StringJSON](d)
+					v, err := json.DecodeJSON[testtypes.StringJSON](d)
 					elem = v
 					if err != nil {
 						return err
@@ -1121,7 +1224,7 @@ func (s *RequiredOK) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"array\"")
 			}
 		case "map":
-			requiredBitSet[1] |= 1 << 5
+			requiredBitSet[1] |= 1 << 7
 			if err := func() error {
 				if err := s.Map.Decode(d); err != nil {
 					return err
@@ -1141,7 +1244,7 @@ func (s *RequiredOK) Decode(d *jx.Decoder) error {
 	var failures []validate.FieldError
 	for i, mask := range [2]uint8{
 		0b11111111,
-		0b00111111,
+		0b11111111,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -1199,7 +1302,7 @@ func (s RequiredOKMap) encodeFields(e *jx.Encoder) {
 	for k, elem := range s {
 		e.FieldStart(k)
 
-		json.EncodeStringJSON(e, elem)
+		json.EncodeJSON(e, elem)
 	}
 }
 
@@ -1212,7 +1315,7 @@ func (s *RequiredOKMap) Decode(d *jx.Decoder) error {
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		var elem testtypes.StringJSON
 		if err := func() error {
-			v, err := json.DecodeStringJSON[testtypes.StringJSON](d)
+			v, err := json.DecodeJSON[testtypes.StringJSON](d)
 			elem = v
 			if err != nil {
 				return err

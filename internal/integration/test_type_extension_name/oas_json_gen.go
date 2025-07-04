@@ -39,14 +39,14 @@ func (o *OptDecimal) Decode(d *jx.Decoder, format func(*jx.Decoder) (decimal.Dec
 // MarshalJSON implements stdjson.Marshaler.
 func (s OptDecimal) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
-	s.Encode(&e, json.EncodeStringExternal)
+	s.Encode(&e, json.EncodeExternal)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *OptDecimal) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
-	return s.Decode(d, json.DecodeStringExternal[decimal.Decimal])
+	return s.Decode(d, json.DecodeExternal[decimal.Decimal])
 }
 
 // Encode encodes decimal2.Decimal as json.
@@ -96,7 +96,7 @@ func (s *OptionalOK) encodeFields(e *jx.Encoder) {
 	{
 		if s.Foo.Set {
 			e.FieldStart("foo")
-			s.Foo.Encode(e, json.EncodeStringExternal)
+			s.Foo.Encode(e, json.EncodeExternal)
 		}
 	}
 	{
@@ -124,7 +124,7 @@ func (s *OptionalOK) Decode(d *jx.Decoder) error {
 		case "foo":
 			if err := func() error {
 				s.Foo.Reset()
-				if err := s.Foo.Decode(d, json.DecodeStringExternal[decimal.Decimal]); err != nil {
+				if err := s.Foo.Decode(d, json.DecodeExternal[decimal.Decimal]); err != nil {
 					return err
 				}
 				return nil
@@ -176,7 +176,7 @@ func (s *RequiredOK) Encode(e *jx.Encoder) {
 func (s *RequiredOK) encodeFields(e *jx.Encoder) {
 	{
 		e.FieldStart("foo")
-		json.EncodeStringExternal(e, s.Foo)
+		json.EncodeExternal(e, s.Foo)
 	}
 	{
 		e.FieldStart("bar")
@@ -201,7 +201,7 @@ func (s *RequiredOK) Decode(d *jx.Decoder) error {
 		case "foo":
 			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
-				v, err := json.DecodeStringExternal[decimal.Decimal](d)
+				v, err := json.DecodeExternal[decimal.Decimal](d)
 				s.Foo = v
 				if err != nil {
 					return err

@@ -148,6 +148,52 @@ func (o OptAny) Or(d any) any {
 	return d
 }
 
+// NewOptBinary returns new OptBinary with value set to v.
+func NewOptBinary(v testtypes.Binary) OptBinary {
+	return OptBinary{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptBinary is optional testtypes.Binary.
+type OptBinary struct {
+	Value testtypes.Binary
+	Set   bool
+}
+
+// IsSet returns true if OptBinary was set.
+func (o OptBinary) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptBinary) Reset() {
+	var v testtypes.Binary
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptBinary) SetTo(v testtypes.Binary) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptBinary) Get() (v testtypes.Binary, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptBinary) Or(d testtypes.Binary) testtypes.Binary {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptNumber returns new OptNumber with value set to v.
 func NewOptNumber(v testtypes.Number) OptNumber {
 	return OptNumber{
@@ -569,6 +615,8 @@ type OptionalOK struct {
 	JsonNumber   OptNumberJSON          `json:"jsonNumber"`
 	TextString   OptText                `json:"textString"`
 	TextNumber   OptText                `json:"textNumber"`
+	BinaryByte   OptBinary              `json:"binaryByte"`
+	BinaryBase64 OptBinary              `json:"binaryBase64"`
 	String       OptString              `json:"string"`
 	Number       OptNumber              `json:"number"`
 	Alias        OptAlias               `json:"alias"`
@@ -607,6 +655,16 @@ func (s *OptionalOK) GetTextString() OptText {
 // GetTextNumber returns the value of TextNumber.
 func (s *OptionalOK) GetTextNumber() OptText {
 	return s.TextNumber
+}
+
+// GetBinaryByte returns the value of BinaryByte.
+func (s *OptionalOK) GetBinaryByte() OptBinary {
+	return s.BinaryByte
+}
+
+// GetBinaryBase64 returns the value of BinaryBase64.
+func (s *OptionalOK) GetBinaryBase64() OptBinary {
+	return s.BinaryBase64
 }
 
 // GetString returns the value of String.
@@ -679,6 +737,16 @@ func (s *OptionalOK) SetTextNumber(val OptText) {
 	s.TextNumber = val
 }
 
+// SetBinaryByte sets the value of BinaryByte.
+func (s *OptionalOK) SetBinaryByte(val OptBinary) {
+	s.BinaryByte = val
+}
+
+// SetBinaryBase64 sets the value of BinaryBase64.
+func (s *OptionalOK) SetBinaryBase64(val OptBinary) {
+	s.BinaryBase64 = val
+}
+
 // SetString sets the value of String.
 func (s *OptionalOK) SetString(val OptString) {
 	s.String = val
@@ -737,6 +805,8 @@ type RequiredOK struct {
 	JsonNumber   testtypes.NumberJSON   `json:"jsonNumber"`
 	TextString   testtypes.Text         `json:"textString"`
 	TextNumber   testtypes.Text         `json:"textNumber"`
+	BinaryByte   testtypes.Binary       `json:"binaryByte"`
+	BinaryBase64 testtypes.Binary       `json:"binaryBase64"`
 	String       testtypes.String       `json:"string"`
 	Number       testtypes.Number       `json:"number"`
 	Alias        Alias                  `json:"alias"`
@@ -775,6 +845,16 @@ func (s *RequiredOK) GetTextString() testtypes.Text {
 // GetTextNumber returns the value of TextNumber.
 func (s *RequiredOK) GetTextNumber() testtypes.Text {
 	return s.TextNumber
+}
+
+// GetBinaryByte returns the value of BinaryByte.
+func (s *RequiredOK) GetBinaryByte() testtypes.Binary {
+	return s.BinaryByte
+}
+
+// GetBinaryBase64 returns the value of BinaryBase64.
+func (s *RequiredOK) GetBinaryBase64() testtypes.Binary {
+	return s.BinaryBase64
 }
 
 // GetString returns the value of String.
@@ -845,6 +925,16 @@ func (s *RequiredOK) SetTextString(val testtypes.Text) {
 // SetTextNumber sets the value of TextNumber.
 func (s *RequiredOK) SetTextNumber(val testtypes.Text) {
 	s.TextNumber = val
+}
+
+// SetBinaryByte sets the value of BinaryByte.
+func (s *RequiredOK) SetBinaryByte(val testtypes.Binary) {
+	s.BinaryByte = val
+}
+
+// SetBinaryBase64 sets the value of BinaryBase64.
+func (s *RequiredOK) SetBinaryBase64(val testtypes.Binary) {
+	s.BinaryBase64 = val
 }
 
 // SetString sets the value of String.

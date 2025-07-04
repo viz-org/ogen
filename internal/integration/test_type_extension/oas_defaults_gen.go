@@ -11,7 +11,7 @@ import (
 // setDefaults set default value of fields.
 func (s *OptionalOK) setDefaults() {
 	{
-		val, _ := json.DecodeStringNative[testtypes.StringOgen](jx.DecodeStr("\"10\""))
+		val, _ := json.DecodeNative[testtypes.StringOgen](jx.DecodeStr("\"10\""))
 		s.OgenString.SetTo(val)
 	}
 	{
@@ -19,7 +19,7 @@ func (s *OptionalOK) setDefaults() {
 		s.OgenNumber.SetTo(val)
 	}
 	{
-		val, _ := json.DecodeStringJSON[testtypes.StringJSON](jx.DecodeStr("\"30\""))
+		val, _ := json.DecodeJSON[testtypes.StringJSON](jx.DecodeStr("\"30\""))
 		s.JsonString.SetTo(val)
 	}
 	{
@@ -35,23 +35,31 @@ func (s *OptionalOK) setDefaults() {
 		s.TextNumber.SetTo(val)
 	}
 	{
-		val, _ := json.DecodeStringExternal[testtypes.String](jx.DecodeStr("\"70\""))
+		val, _ := json.DecodeBinary[testtypes.Binary](jx.DecodeStr("\"NzA=\""))
+		s.BinaryByte.SetTo(val)
+	}
+	{
+		val, _ := json.DecodeBinary[testtypes.Binary](jx.DecodeStr("\"ODA=\""))
+		s.BinaryBase64.SetTo(val)
+	}
+	{
+		val, _ := json.DecodeExternal[testtypes.String](jx.DecodeStr("\"90\""))
 		s.String.SetTo(val)
 	}
 	{
-		val, _ := json.DecodeExternal[testtypes.Number](jx.DecodeStr("80"))
+		val, _ := json.DecodeExternal[testtypes.Number](jx.DecodeStr("100"))
 		s.Number.SetTo(val)
 	}
 	{
-		val, _ := json.DecodeStringNative[testtypes.StringOgen](jx.DecodeStr("\"90\""))
+		val, _ := json.DecodeNative[testtypes.StringOgen](jx.DecodeStr("\"110\""))
 		s.Alias.SetTo(Alias(val))
 	}
 	{
-		val, _ := json.DecodeNative[testtypes.NumberOgen](jx.DecodeStr("100"))
+		val, _ := json.DecodeNative[testtypes.NumberOgen](jx.DecodeStr("120"))
 		s.Pointer.SetTo(val)
 	}
 	{
-		val, _ := json.DecodeStringNative[testtypes.StringOgen](jx.DecodeStr("\"110\""))
+		val, _ := json.DecodeNative[testtypes.StringOgen](jx.DecodeStr("\"130\""))
 		s.AliasPointer.SetTo(AliasPointer(val))
 	}
 }
@@ -59,11 +67,11 @@ func (s *OptionalOK) setDefaults() {
 // setDefaults set default value of fields.
 func (s *RequiredOK) setDefaults() {
 	{
-		val, _ := json.DecodeStringNative[testtypes.StringOgen](jx.DecodeStr("\"90\""))
+		val, _ := json.DecodeNative[testtypes.StringOgen](jx.DecodeStr("\"110\""))
 		s.Alias = Alias(val)
 	}
 	{
-		val, _ := json.DecodeStringNative[testtypes.StringOgen](jx.DecodeStr("\"110\""))
+		val, _ := json.DecodeNative[testtypes.StringOgen](jx.DecodeStr("\"130\""))
 		s.AliasPointer = AliasPointer(val)
 	}
 }

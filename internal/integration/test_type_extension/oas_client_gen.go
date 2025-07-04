@@ -210,7 +210,7 @@ func (c *Client) sendOptional(ctx context.Context, params OptionalParams) (res *
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
 			if val, ok := params.TextString.Get(); ok {
-				return e.EncodeValue(conv.StringTextToString(val))
+				return e.EncodeValue(conv.TextToString(val))
 			}
 			return nil
 		}); err != nil {
@@ -228,6 +228,40 @@ func (c *Client) sendOptional(ctx context.Context, params OptionalParams) (res *
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
 			if val, ok := params.TextNumber.Get(); ok {
 				return e.EncodeValue(conv.TextToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "binaryByte" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "binaryByte",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.BinaryByte.Get(); ok {
+				return e.EncodeValue(conv.BinaryToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "binaryBase64" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "binaryBase64",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.BinaryBase64.Get(); ok {
+				return e.EncodeValue(conv.BinaryToString(val))
 			}
 			return nil
 		}); err != nil {
@@ -491,7 +525,7 @@ func (c *Client) sendRequired(ctx context.Context, params RequiredParams) (res *
 		}
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			return e.EncodeValue(conv.StringTextToString(params.TextString))
+			return e.EncodeValue(conv.TextToString(params.TextString))
 		}); err != nil {
 			return res, errors.Wrap(err, "encode query")
 		}
@@ -506,6 +540,34 @@ func (c *Client) sendRequired(ctx context.Context, params RequiredParams) (res *
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
 			return e.EncodeValue(conv.TextToString(params.TextNumber))
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "binaryByte" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "binaryByte",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			return e.EncodeValue(conv.BinaryToString(params.BinaryByte))
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "binaryBase64" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "binaryBase64",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			return e.EncodeValue(conv.BinaryToString(params.BinaryBase64))
 		}); err != nil {
 			return res, errors.Wrap(err, "encode query")
 		}
